@@ -20,7 +20,8 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 fun Application.userGetApi() {
-    val service = UserCacheService(environment.config.property("redis.host").getString(), this, CassandraConnector())
+    val cassandra = CassandraConnector(environment.config.property("storage.cassandra.host").getString())
+    val service = UserCacheService(environment.config.property("storage.redis.host").getString(), this, cassandra)
     routing {
         route("/user") {
             accept(ContentType.Application.Json) {
