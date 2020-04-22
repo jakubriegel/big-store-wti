@@ -6,6 +6,8 @@ import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
 import io.ktor.jackson.jackson
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 
 fun Application.main() {
@@ -16,4 +18,7 @@ fun Application.main() {
     }
 }
 
-fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>) {
+    runBlocking { delay(5_000) } // wait for Cassandra TODO: fix
+    io.ktor.server.netty.EngineMain.main(args)
+}
