@@ -10,9 +10,11 @@ import org.intellij.lang.annotations.Language
 import java.net.InetSocketAddress
 
 @ObsoleteCoroutinesApi
-class CassandraConnector {
+class CassandraConnector (
+    host: String
+) {
     private val session = CqlSession.builder()
-        .addContactPoint(InetSocketAddress("localhost", 9042))
+        .addContactPoint(InetSocketAddress(host, 9042))
         .withKeyspace(CqlIdentifier.fromCql("users"))
         .withLocalDatacenter("datacenter1")
         .build()

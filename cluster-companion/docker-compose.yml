@@ -6,12 +6,14 @@ services:
       - 60001:60001
     networks:
       - cluster-companion-net
-    links:
-      - cache:redis
   cache:
     image: redis
     ports:
       - 6379:6379
+    networks:
+      - cluster-companion-net
+  store:
+    build: ./db
     networks:
       - cluster-companion-net
 networks:

@@ -12,11 +12,14 @@ import io.ktor.response.respond
 import io.ktor.routing.put
 import io.ktor.routing.route
 import io.ktor.routing.routing
+import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
+@KtorExperimentalAPI
 @ObsoleteCoroutinesApi
 fun Application.userUpdateApi() {
-    val service = UserUpdateService(CassandraConnector())
+    val cassandra = CassandraConnector(environment.config.property("storage.cassandra.host").getString())
+    val service = UserUpdateService(cassandra)
     routing {
         route("/user/{id}") {
             put("/ratings") {

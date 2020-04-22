@@ -1,3 +1,7 @@
+DROP KEYSPACE IF EXISTS users;
+CREATE KEYSPACE users
+WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+
 USE users;
 
 DROP TABLE IF EXISTS  user_avg;
