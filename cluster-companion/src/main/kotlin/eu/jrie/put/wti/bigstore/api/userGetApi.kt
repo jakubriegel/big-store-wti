@@ -1,7 +1,11 @@
 package eu.jrie.put.wti.bigstore.api
 
 import eu.jrie.put.wti.bigstore.service.UserCacheService
+import eu.jrie.put.wti.bigstore.storage.UserCacheRepository
+import eu.jrie.put.wti.bigstore.storage.UserRepository
 import eu.jrie.put.wti.bigstore.storage.cassandra.CassandraConnector
+import eu.jrie.put.wti.bigstore.storage.redis.RedisConnector
+import eu.jrie.put.wti.bigstore.util.JsonMapper
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.http.ContentType
@@ -20,14 +24,19 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 fun Application.userGetApi() {
+    val jsonMapper = JsonMapper()
+    val redis = RedisConnector(environment.config.property("storage.redis.host").getString())
+    val cache = UserCacheRepository(redis, jsonMapper)
     val cassandra = CassandraConnector(environment.config.property("storage.cassandra.host").getString())
-    val service = UserCacheService(environment.config.property("storage.redis.host").getString(), this, cassandra)
+    val repository = UserRepository(cassandra, this)
+    val service = UserCacheService(this, cache, repository)
     routing {
         route("/user") {
             accept(ContentType.Application.Json) {
                 get("/full/{id}") {
                     val id = call.parameters["id"]!!.toInt()
-                    call.respondText(service.get(id), ContentType.Application.Json)
+                    val user = service.get(id).let { jsonMapper.write(it) }
+                    call.respondText(user, ContentType.Application.Json)
                 }
             }
             accept(ContentType.Text.CSV) {
