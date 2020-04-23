@@ -17,7 +17,7 @@ class JsonMapper {
         registerModule(JavaTimeModule())
     }
 
-    suspend inline fun <reified T : Any> read(json: String) = read(json, T::class)
+    suspend inline fun <reified T : Any> read(json: String): T = read(json, T::class)
 
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun <T : Any> read(json: String, type: KClass<T>): T = withContext(context) {
@@ -25,7 +25,7 @@ class JsonMapper {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun write(entity: Any) = withContext(context) {
+    suspend fun write(entity: Any): String = withContext(context) {
         mapper.writeValueAsString(entity)
     }
 }
