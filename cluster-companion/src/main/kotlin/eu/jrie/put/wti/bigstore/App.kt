@@ -19,6 +19,6 @@ fun Application.main() {
 }
 
 fun main(args: Array<String>) {
-    runBlocking { delay(5_000) } // wait for Cassandra TODO: fix
+    runBlocking { delay(25_000) } // wait for Cassandra TODO: fix
     io.ktor.server.netty.EngineMain.main(args)
 }
