@@ -9,6 +9,7 @@ services:
     # companion 1
     cluster-companion-1:
         build: ../cluster-companion
+        restart: on-failure
         environment:
             - CACHE_HOST=cache-1
         ports:
@@ -26,6 +27,7 @@ services:
     # companion 2
     cluster-companion-2:
         build: ../cluster-companion
+        restart: on-failure
         environment:
             - CACHE_HOST=cache-2
         ports:
@@ -43,6 +45,7 @@ services:
     # companion 3
     cluster-companion-3:
         build: ../cluster-companion
+        restart: on-failure
         environment:
             - CACHE_HOST=cache-3
         ports:
