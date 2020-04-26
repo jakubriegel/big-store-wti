@@ -21,9 +21,9 @@ object Router {
     import akka.http.scaladsl.server.PathMatcher._
 
     val getPaths = companionsHosts.zipWithIndex
-      .map { case (host, index) => (host, index+1) }
-      .map { case (host, id) =>
-        path("user" / "" ~ new ModuloMatcher(companionsHosts.length, id)) { id =>
+      .map { case (host, index) =>
+        actorSystem.log.info(s"creating path for $host with id $index")
+        path("user" / "" ~ new ModuloMatcher(companionsHosts.length, index)) { id =>
           complete(
             Future { s"""{"id": $id,"companionId": $id,"companionHost": "$host"}""" }
               .map { HttpEntity(ContentTypes.`application/json`, _) }
@@ -37,22 +37,22 @@ object Router {
     }
   }
 
-  private val config = ConfigFactory.load().getConfig("big-store.hub")
+  private val config = ConfigFactory.load().getConfig("big-store.hub.publicApi")
 
   def run(companionsHosts: Seq[String]): ActorSystem[Done] = ActorSystem[Done](Behaviors.setup[Done] { ctx =>
 
     import akka.actor.typed.scaladsl.adapter._
     implicit val system: akka.actor.ActorSystem = ctx.system.toClassic
     implicit val ec: ExecutionContextExecutor = ctx.system.executionContext
-
+    ctx.log.info(s"got $companionsHosts")
     Http().bindAndHandle(
       routes(companionsHosts)(ctx.system),
       config.getString("host"), config.getInt("port")
     ).onComplete {
       case Success(bound) =>
-        ctx.log.info(s"Api online at http://${bound.localAddress.getHostString}:${bound.localAddress.getPort}/")
+        ctx.log.info(s"Public API online at http://${bound.localAddress.getHostString}:${bound.localAddress.getPort}/")
       case Failure(e) =>
-        Console.err.println(s"Server could not start!")
+        ctx.log.error(s"Public API could not start! $e")
         e.printStackTrace()
         ctx.self ! Done
     }

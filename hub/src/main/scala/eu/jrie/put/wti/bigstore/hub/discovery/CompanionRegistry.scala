@@ -13,7 +13,7 @@ object CompanionRegistry {
   case class RegisterCompanion(host: String, replyTo: ActorRef[CompanionId]) extends CompanionRegistryMsg
   case class SetCompanionReady(host: String, id: Int, replyTo: ActorRef[AllCompanionsReady]) extends CompanionRegistryMsg
   case class CompanionId(id: Int) extends CompanionRegistryMsg
-  case class AllCompanionsReady(allReady: Boolean) extends CompanionRegistryMsg
+  case class AllCompanionsReady(allReady: Boolean, hosts: Seq[String] = Nil) extends CompanionRegistryMsg
 
   private val nextId = new AtomicInteger()
   private val registeredCompanions: mutable.Set[(String, Int)] = mutable.Set()
@@ -45,10 +45,10 @@ class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit cont
           readyCompanions.add((readyHost, readyId))
         }
         if (readyCompanions.size == expectedCompanionsNumber) {
-          replyTo ! AllCompanionsReady(true)
+          replyTo ! AllCompanionsReady(allReady = true, readyCompanions map { case (host, _) => host } toSeq)
           Behaviors.stopped
         } else {
-          replyTo ! AllCompanionsReady(false)
+          replyTo ! AllCompanionsReady(allReady = false)
           Behaviors.same
         }
     }
