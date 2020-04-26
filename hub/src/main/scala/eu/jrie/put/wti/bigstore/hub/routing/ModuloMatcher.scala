@@ -1,8 +1,8 @@
-package eu.jrie.put.wti.bigstore.hub
+package eu.jrie.put.wti.bigstore.hub.routing
 
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.PathMatcher
-import akka.http.scaladsl.server.PathMatchers.{IntNumber, LongNumber, NumberMatcher}
+import akka.http.scaladsl.server.PathMatchers.NumberMatcher
 
 class ModuloMatcher(
                      private val divisor: Long,

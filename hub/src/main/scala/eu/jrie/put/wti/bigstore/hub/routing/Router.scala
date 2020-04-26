@@ -9,7 +9,6 @@ import akka.http.scaladsl.server.Directives.{complete, get, path}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.RouteConcatenation.concat
 import com.typesafe.config.ConfigFactory
-import eu.jrie.put.wti.bigstore.hub.ModuloMatcher
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
