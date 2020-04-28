@@ -14,7 +14,7 @@ object CompanionRegistry {
   case class RegisterCompanion(host: String, replyTo: ActorRef[CompanionId]) extends CompanionRegistryMsg
   case class SetCompanionReady(host: String, id: Int, replyTo: ActorRef[AllCompanionsReady]) extends CompanionRegistryMsg
   case class CompanionId(id: Int) extends CompanionRegistryMsg
-  case class AllCompanionsReady(allReady: Boolean, hosts: Seq[String] = Nil) extends CompanionRegistryMsg
+  case class AllCompanionsReady(allReady: Boolean, hosts: Seq[(String, Int)] = Nil) extends CompanionRegistryMsg
 
   private val nextId = new AtomicInteger()
   private val registeredCompanions: mutable.Set[(String, Int)] = mutable.Set()
@@ -35,7 +35,7 @@ class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit ctx:
         val id = registeredCompanions.find { case (h, _) => h.equals(host) }
           .map { case (_, id) => id }
           .getOrElse {
-            val id = nextId.getAndIncrement()
+            val id = nextId.incrementAndGet()
             registeredCompanions.add((host, id))
             context.log.info(s"registering companion with id $id for host $host, ${expectedCompanionsNumber - registeredCompanions.size} to go")
             id
@@ -50,7 +50,7 @@ class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit ctx:
         if (readyCompanions.size == expectedCompanionsNumber) {
           replyTo ! AllCompanionsReady(
             allReady = true,
-            readyCompanions map { case (host, _) => host } toSeq
+            readyCompanions toSeq
           )
           Behaviors.stopped
         } else {

@@ -20,7 +20,7 @@ object Router {
 
   private val config = ConfigFactory.load().getConfig("big-store.hub.publicApi")
 
-  private def routes(companionsHosts: Seq[String], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]): Route = {
+  private def routes(companionsHosts: Seq[(String, Int)], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]): Route = {
     concat(
       get {
         concat(companionGetRoute(companionsHosts, http):_*)
@@ -28,18 +28,18 @@ object Router {
     )
   }
 
-  private def companionGetRoute(companionsHosts: Seq[String], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]) = {
+  private def companionGetRoute(companionsHosts: Seq[(String, Int)], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]) = {
     import akka.http.scaladsl.server.PathMatcher._
     implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
 
-    companionsHosts.zipWithIndex map { case (host, index) =>
-      actorSystem.log.info(s"creating path for $host with id $index")
-      path("user" / new ModuloMatcher(companionsHosts.length, index)) { id =>
-        actorSystem.log.info(s"Routing GET user $id to companion $host")
+    companionsHosts map { case (host, id) =>
+      actorSystem.log.info(s"creating path for $host with id $id")
+      path("user" / new ModuloMatcher(companionsHosts.length, id-1)) { userId =>
+        actorSystem.log.info(s"Routing GET user $userId to companion ($host, $id)")
         complete(
           Future {
             HttpRequest(
-              uri = s"http://$host:60001/user/full/$id",
+              uri = s"http://$host:60001/user/full/$userId",
               headers = Seq(Accept(MediaTypes.`application/json`))
             )
           } .flatMap { http.singleRequest(_) }
@@ -48,7 +48,7 @@ object Router {
     }
   }
 
-  def run(companionsHosts: Seq[String]): ActorSystem[Done] = ActorSystem[Done](Behaviors.setup[Done] { ctx =>
+  def run(companionsHosts: Seq[(String, Int)]): ActorSystem[Done] = ActorSystem[Done](Behaviors.setup[Done] { ctx =>
     import akka.actor.typed.scaladsl.adapter._
     implicit val system: akka.actor.ActorSystem = ctx.system.toClassic
     implicit val ec: ExecutionContextExecutor = ctx.system.executionContext

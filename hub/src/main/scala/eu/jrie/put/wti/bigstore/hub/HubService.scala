@@ -7,7 +7,7 @@ import eu.jrie.put.wti.bigstore.hub.routing.Router
 
 object HubService extends App {
   sealed trait HubServiceMsg
-  case class Companions(companionsHosts: Seq[String]) extends HubServiceMsg
+  case class Companions(companionsHosts: Seq[(String, Int)]) extends HubServiceMsg
   case class HubError(msg: String = "") extends HubServiceMsg
 
   val hubSystem = ActorSystem[HubServiceMsg](Behaviors.receiveMessage {

@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 
 object DiscoveryRoutes {
   sealed trait CompanionsDiscoveryMsg
-  case class CompanionsReady(hosts: Seq[String]) extends CompanionsDiscoveryMsg
+  case class CompanionsReady(hosts: Seq[(String, Int)]) extends CompanionsDiscoveryMsg
   case class CompanionsDiscoveryError() extends CompanionsDiscoveryMsg
 
   private val config = ConfigFactory.load().getConfig("big-store.hub")
