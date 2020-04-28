@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import eu.jrie.put.wti.bigstore.hub.discovery.CompanionRegistry.{CompanionRegistryMsg, RegisterCompanion, SetCompanionReady}
+import scala.language.postfixOps
 
 import scala.collection.mutable
 
@@ -23,8 +24,8 @@ object CompanionRegistry {
     Behaviors.setup(implicit context => new CompanionRegistry(expectedCompanionsNumber))
 }
 
-class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit context: ActorContext[CompanionRegistryMsg])
-  extends AbstractBehavior[CompanionRegistryMsg](context) {
+class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit ctx: ActorContext[CompanionRegistryMsg])
+  extends AbstractBehavior[CompanionRegistryMsg](ctx) {
 
   import CompanionRegistry._
 
@@ -36,16 +37,21 @@ class CompanionRegistry(private val expectedCompanionsNumber: Int)(implicit cont
           .getOrElse {
             val id = nextId.getAndIncrement()
             registeredCompanions.add((host, id))
+            context.log.info(s"registering companion with id $id for host $host, ${expectedCompanionsNumber - registeredCompanions.size} to go")
             id
           }
         replyTo ! CompanionId(id)
         Behaviors.same
       case SetCompanionReady(readyHost, readyId, replyTo) =>
+        context.log.info(s"registering companion with id $readyId for host $readyHost as ready")
         if (registeredCompanions.remove((readyHost, readyId))) {
           readyCompanions.add((readyHost, readyId))
         }
         if (readyCompanions.size == expectedCompanionsNumber) {
-          replyTo ! AllCompanionsReady(allReady = true, readyCompanions map { case (host, _) => host } toSeq)
+          replyTo ! AllCompanionsReady(
+            allReady = true,
+            readyCompanions map { case (host, _) => host } toSeq
+          )
           Behaviors.stopped
         } else {
           replyTo ! AllCompanionsReady(allReady = false)

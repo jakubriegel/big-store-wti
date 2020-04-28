@@ -1,10 +1,13 @@
 package eu.jrie.put.wti.bigstore.hub.routing
 
+import java.net.http.HttpHeaders
+
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.headers.Accept
+import akka.http.scaladsl.{Http, HttpExt}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse, MediaTypes, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, get, path}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.RouteConcatenation.concat
@@ -14,39 +17,46 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
 object Router {
-  private def routes(companionsHosts: Seq[String])(implicit actorSystem: ActorSystem[_]): Route = {
-
-    implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
-
-    import akka.http.scaladsl.server.PathMatcher._
-
-    val getPaths = companionsHosts.zipWithIndex
-      .map { case (host, index) =>
-        actorSystem.log.info(s"creating path for $host with id $index")
-        path("user" / "" ~ new ModuloMatcher(companionsHosts.length, index)) { id =>
-          complete(
-            Future { s"""{"id": $id,"companionId": $id,"companionHost": "$host"}""" }
-              .map { HttpEntity(ContentTypes.`application/json`, _) }
-              .map { HttpResponse(StatusCodes.OK, Seq.empty, _) }
-          )
-        }
-      }
-
-    get {
-      concat(getPaths:_*)
-    }
-  }
 
   private val config = ConfigFactory.load().getConfig("big-store.hub.publicApi")
 
-  def run(companionsHosts: Seq[String]): ActorSystem[Done] = ActorSystem[Done](Behaviors.setup[Done] { ctx =>
+  private def routes(companionsHosts: Seq[String], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]): Route = {
+    concat(
+      get {
+        concat(companionGetRoute(companionsHosts, http):_*)
+      }
+    )
+  }
 
+  private def companionGetRoute(companionsHosts: Seq[String], http: HttpExt)(implicit actorSystem: ActorSystem[Nothing]) = {
+    import akka.http.scaladsl.server.PathMatcher._
+    implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
+
+    companionsHosts.zipWithIndex map { case (host, index) =>
+      actorSystem.log.info(s"creating path for $host with id $index")
+      path("user" / new ModuloMatcher(companionsHosts.length, index)) { id =>
+        actorSystem.log.info(s"Routing GET user $id to companion $host")
+        complete(
+          Future {
+            HttpRequest(
+              uri = s"http://$host:60001/user/full/$id",
+              headers = Seq(Accept(MediaTypes.`application/json`))
+            )
+          } .flatMap { http.singleRequest(_) }
+        )
+      }
+    }
+  }
+
+  def run(companionsHosts: Seq[String]): ActorSystem[Done] = ActorSystem[Done](Behaviors.setup[Done] { ctx =>
     import akka.actor.typed.scaladsl.adapter._
     implicit val system: akka.actor.ActorSystem = ctx.system.toClassic
     implicit val ec: ExecutionContextExecutor = ctx.system.executionContext
+
     ctx.log.info(s"got $companionsHosts")
-    Http().bindAndHandle(
-      routes(companionsHosts)(ctx.system),
+    val http = Http()
+    http.bindAndHandle(
+      routes(companionsHosts, http)(ctx.system),
       config.getString("host"), config.getInt("port")
     ).onComplete {
       case Success(bound) =>

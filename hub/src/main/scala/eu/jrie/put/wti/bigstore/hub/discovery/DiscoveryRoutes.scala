@@ -19,7 +19,7 @@ object DiscoveryRoutes {
   case class CompanionsReady(hosts: Seq[String]) extends CompanionsDiscoveryMsg
   case class CompanionsDiscoveryError() extends CompanionsDiscoveryMsg
 
-  private val config = ConfigFactory.load().getConfig("big-store.hub.internalApi")
+  private val config = ConfigFactory.load().getConfig("big-store.hub")
 
   private def routes(companionRegistry: ActorRef[CompanionRegistryMsg])(implicit actorSystem: ActorSystem[CompanionsDiscoveryMsg]): Route = {
     implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
@@ -31,7 +31,7 @@ object DiscoveryRoutes {
     concat(
       path("register") {
         post {
-          extractHost { host =>
+          headerValueByName("Companion-Host") { host =>
             val id: Future[CompanionId] = companionRegistry ? (RegisterCompanion(host, _))
             complete(
               id.map { _.id }
@@ -44,13 +44,13 @@ object DiscoveryRoutes {
       },
       path("register"/ IntNumber / "ready") { id =>
         post {
-          extractHost { host =>
+          headerValueByName("Companion-Host") { host =>
             val data: Future[AllCompanionsReady] = companionRegistry ? (SetCompanionReady(host, id, _))
             complete(
               data.map {
                 case AllCompanionsReady(true, hosts) =>
                   actorSystem ! CompanionsReady(hosts)
-                  StatusCodes.Accepted
+                  StatusCodes.OK
                 case _ => StatusCodes.OK
               } .map {
                 HttpResponse(_, Seq.empty)
@@ -68,10 +68,12 @@ object DiscoveryRoutes {
     implicit val classicSystem: akka.actor.ActorSystem = ctx.system.toClassic
     implicit val ec: ExecutionContextExecutor = ctx.system.executionContext
 
-    val registry: ActorRef[CompanionRegistryMsg] = ctx.spawn(CompanionRegistry(1), "companionRegistry")
+    val expectedCompanionsNumber = config.getInt("companions.expectedNumber")
+    val registry: ActorRef[CompanionRegistryMsg] = ctx.spawn(CompanionRegistry(expectedCompanionsNumber), "companionRegistry")
+
     Http().bindAndHandle(
       routes(registry)(ctx.system.asInstanceOf[ActorSystem[CompanionsDiscoveryMsg]]),
-      config.getString("host"), config.getInt("port")
+      config.getString("internalApi.host"), config.getInt("internalApi.port")
     ).onComplete {
       case Success(bound) =>
         ctx.log.info(s"Register endpoints online at http://${bound.localAddress.getHostString}:${bound.localAddress.getPort}/")
