@@ -18,7 +18,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @KtorExperimentalAPI
 @ObsoleteCoroutinesApi
 fun Application.userUpdateApi() {
-    val cassandra = CassandraConnector(environment.config.property("storage.cassandra.host").getString())
+    val cassandra = CassandraConnector(environment.config.property("big-store.storage.cassandra.host").getString())
     val service = UserUpdateService(cassandra)
     routing {
         route("/user/{id}") {

@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   cluster-companion:
-    build: ../../db
+    build: .
     ports:
       - 60001:60001
     networks:
@@ -13,7 +13,7 @@ services:
     networks:
       - cluster-companion-net
   store:
-    build: ./db
+    build: ./../db
     networks:
       - cluster-companion-net
 networks:

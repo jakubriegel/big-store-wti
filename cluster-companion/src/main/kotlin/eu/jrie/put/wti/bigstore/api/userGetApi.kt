@@ -25,9 +25,9 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @KtorExperimentalAPI
 fun Application.userGetApi() {
     val jsonMapper = JsonMapper()
-    val redis = RedisConnector(environment.config.property("storage.redis.host").getString())
+    val redis = RedisConnector(environment.config.property("big-store.storage.redis.host").getString())
     val cache = UserCacheRepository(redis, jsonMapper)
-    val cassandra = CassandraConnector(environment.config.property("storage.cassandra.host").getString())
+    val cassandra = CassandraConnector(environment.config.property("big-store.storage.cassandra.host").getString())
     val repository = UserRepository(cassandra, this)
     val service = UserCacheService(this, cache, repository)
     routing {

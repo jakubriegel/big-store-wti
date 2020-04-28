@@ -28,6 +28,8 @@ dependencies {
     implementation("io.ktor:ktor-metrics:$ktorVersion")
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
 
     // redis
     implementation("io.lettuce:lettuce-core:5.2.0.RELEASE")

@@ -4,6 +4,7 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitSingle
 import java.time.Duration
 
 class RedisConnector (
@@ -22,4 +23,12 @@ class RedisConnector (
         .collect {
             if (it != "OK") throw RuntimeException("error setting redis value")
         }
+
+    private suspend fun ping() = client.ping()
+        .awaitSingle()
+        .let { it == "PONG" }
+
+    companion object {
+        suspend fun test(host: String) = RedisConnector(host).ping()
+    }
 }
