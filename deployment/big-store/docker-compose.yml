@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+    # store
+    store:
+        build: ../../db
+        ports: 
+            - 7000:7000
+            - 7001:7001
+            - 7199:7199
+            - 9042:9042
+            - 9160:9160
+        networks: 
+            - big-store-net
+
+    # hub
+    hub:
+        build: ../../hub
+        ports: 
+            - 80:60001
+        networks: 
+            - big-store-net
+
+    # companions
+    cluster-companion:
+        build: ../../cluster-companion
+        restart: on-failure
+        environment:
+            - CACHE_HOST=big-store_cache_1
+        # ports:
+            # - 60010-60150:60001
+        networks:
+            - big-store-net
+            # - cache-net
+    cache:
+        image: redis
+        # ports:
+        #     - 6379:6379
+        networks:
+            - big-store-net
+            # - cache-net
+
+
+networks:
+    big-store-net:
+    cache-net:
