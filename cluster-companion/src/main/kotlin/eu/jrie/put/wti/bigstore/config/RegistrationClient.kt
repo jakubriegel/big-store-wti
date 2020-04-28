@@ -1,4 +1,4 @@
-package eu.jrie.put.wti.bigstore.service
+package eu.jrie.put.wti.bigstore.config
 
 import eu.jrie.put.wti.bigstore.storage.redis.RedisConnector
 import io.ktor.client.HttpClient
@@ -15,9 +15,13 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.net.InetAddress
 
-object RegistrationService {
+object RegistrationClient {
 
     private data class RegistrationResponse(val id: Int)
+
+    // TODO: move to HOCON
+    private const val HUB_URL = "http://hub:60002"
+    private const val STORAGE_REDIS_HOST_TEMPLATE = "big-store_cache_%s"
 
     private val client = HttpClient(OkHttp) {
         install(HttpTimeout) {
@@ -31,12 +35,18 @@ object RegistrationService {
         }
     }
 
-    fun registerInHub(hubUrl: String, cacheHostTemplate: String): Pair<Int, String> = runBlocking {
+    fun registerInHub(hubUrl: String = HUB_URL, cacheHostTemplate: String = STORAGE_REDIS_HOST_TEMPLATE) = runBlocking {
         client.post<RegistrationResponse>("$hubUrl/register")
             .id
             .let { it to String.format(cacheHostTemplate, it) }
             .also { (id, cacheHost) -> logger.info("Registered with id $id and cacheHost $cacheHost") }
-            .let { (id, cacheHost) -> testRedis(id, cacheHost, hubUrl) }
+            .let { (id, cacheHost) ->
+                testRedis(
+                    id,
+                    cacheHost,
+                    hubUrl
+                )
+            }
     } ?: throw RuntimeException("Cannot register in hub")
 
     private suspend fun testRedis(id: Int, cacheHost: String, hubUrl: String) = RedisConnector.test(cacheHost)
@@ -44,7 +54,11 @@ object RegistrationService {
             when {
                 connectedToRedis -> {
                     logger.info("Successfully tested connection with Redis")
-                    registerAsReady(id, cacheHost, hubUrl)
+                    registerAsReady(
+                        id,
+                        cacheHost,
+                        hubUrl
+                    )
                 }
                 else -> {
                     logger.info("Cannot connect to redis")
@@ -68,5 +82,5 @@ object RegistrationService {
                 }
             }
 
-    private val logger = LoggerFactory.getLogger(RegistrationService::class.java)
+    private val logger = LoggerFactory.getLogger(RegistrationClient::class.java)
 }
