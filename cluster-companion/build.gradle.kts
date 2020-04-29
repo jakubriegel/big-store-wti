@@ -43,6 +43,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.11.0")
 
     // util
     implementation("ch.qos.logback:logback-classic:1.2.3")

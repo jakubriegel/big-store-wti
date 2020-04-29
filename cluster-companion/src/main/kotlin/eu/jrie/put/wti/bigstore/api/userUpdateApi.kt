@@ -23,21 +23,18 @@ fun Application.userUpdateApi() {
     routing {
         route("/user/{id}") {
             put("/ratings") {
-                val id: Int = call.parameters["id"]!!.toInt()
                 val averageRatings: Map<String, Float> = call.receive()
-                service.updateUserAverageRatings(id, averageRatings)
+                service.updateUserAverageRatings(userId, averageRatings)
                 call.respond(HttpStatusCode.OK)
             }
             put("/movies") {
-                val id: Int = call.parameters["id"]!!.toInt()
                 val movie: Movie = call.receive()
-                service.addUserRatedMovie(id, movie)
+                service.addUserRatedMovie(userId, movie)
                 call.respond(HttpStatusCode.OK)
             }
             put("/stats") {
-                val id: Int = call.parameters["id"]!!.toInt()
                 val stats: UserStats = call.receive()
-                service.updateUserStats(id, stats)
+                service.updateUserStats(userId, stats)
                 call.respond(HttpStatusCode.OK)
             }
         }

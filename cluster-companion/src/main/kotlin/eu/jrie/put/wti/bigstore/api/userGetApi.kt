@@ -11,7 +11,6 @@ import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import io.ktor.routing.accept
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -34,9 +33,8 @@ fun Application.userGetApi() {
         route("/user/{id}") {
             accept(ContentType.Application.Json) {
                 get {
-                    val id = call.parameters["id"]!!.toInt()
-                    val user = service.get(id).let { jsonMapper.write(it) }
-                    call.respondText(user, ContentType.Application.Json)
+                    service.get(userId)
+                        .let { call.respond(it) }
                 }
             }
             accept(ContentType.Text.CSV) {
