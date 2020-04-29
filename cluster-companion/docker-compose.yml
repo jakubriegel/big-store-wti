@@ -3,7 +3,7 @@ services:
   cluster-companion:
     build: .
     ports:
-      - 60001:60001
+      - 60010:60010
     networks:
       - cluster-companion-net
   cache:

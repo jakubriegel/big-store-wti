@@ -11,6 +11,7 @@ import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.util.KtorExperimentalAPI
+import java.lang.System.getenv
 
 
 @KtorExperimentalAPI
@@ -22,11 +23,19 @@ fun Application.main() {
     }
 }
 
+private enum class Env {
+    PROD, DEV
+}
 
+fun main(args: Array<String>) = startCompanion(args, Env.valueOf(getenv("BS_ENV") ?: "DEV"))
 
-fun main(args: Array<String>) {
-    val (id, cacheHost) = registerInHub().let { (id, cacheHost) ->
-        "-P:big-store.companion.id=$id" to "-P:big-store.storage.redis.host=$cacheHost"
+private fun startCompanion(args: Array<String>, env: Env) {
+    when (env) {
+        Env.PROD -> registerInHub().let { (id, cacheHost) ->
+            args + "-P:big-store.companion.id=$id" + "-P:big-store.storage.redis.host=$cacheHost"
+        }
+        Env.DEV -> args
+    }.let {
+        embeddedServer(Netty, commandLineEnvironment(it)).start(true)
     }
-    embeddedServer(Netty, commandLineEnvironment(args + id + cacheHost)).start(true)
 }
