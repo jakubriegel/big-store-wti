@@ -32,7 +32,7 @@ fun main(args: Array<String>) = startCompanion(args, Env.valueOf(getenv("BS_ENV"
 private fun startCompanion(args: Array<String>, env: Env) {
     when (env) {
         Env.PROD -> registerInHub().let { (id, cacheHost) ->
-            args + "-P:big-store.companion.id=$id" + "-P:big-store.storage.redis.host=$cacheHost"
+            args + "-P:big-store.companion.id=$id" + "-P:big-store.cache.redis.host=$cacheHost"
         }
         Env.DEV -> args
     }.let {

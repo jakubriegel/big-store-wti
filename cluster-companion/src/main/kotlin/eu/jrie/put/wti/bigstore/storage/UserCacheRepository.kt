@@ -10,13 +10,17 @@ import kotlinx.coroutines.flow.map
 @ObsoleteCoroutinesApi
 class UserCacheRepository (
     private val redis: RedisConnector,
-    private val mapper: JsonMapper
+    private val mapper: JsonMapper,
+    private val ttl: Long
 ) {
     suspend fun getUser(id: Int): Flow<UserCache> = redis.get(userKey(id))
         .map { mapper.read(it) as UserCache }
 
     suspend fun setUser(value: UserCache) {
-        redis.set(value.key(), mapper.write(value))
+        redis.apply {
+            set(value.key(), mapper.write(value))
+            expire(value.key(), ttl)
+        }
     }
 
     companion object {

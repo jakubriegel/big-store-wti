@@ -13,10 +13,10 @@ class RedisConnector (
 ) {
     private val port = 6379
     private val client = run {
-        val client = RedisClient.create(RedisURI(host, port, Duration.ofSeconds(5)))
-        val conn = client.connect()
         logger.info("Connecting to Redis: $host:$port")
-        conn.reactive()
+        RedisClient.create(RedisURI(host, port, Duration.ofSeconds(5)))
+            .connect()
+            .reactive()
     }
 
     fun get(key: String) = client.get(key).asFlow()
@@ -26,6 +26,10 @@ class RedisConnector (
         .collect {
             if (it != "OK") throw RuntimeException("error setting redis value")
         }
+
+    suspend fun expire(key: String, ttl: Long) {
+        client.expire(key, ttl).awaitSingle()
+    }
 
     private suspend fun ping() = client.ping()
         .awaitSingle()

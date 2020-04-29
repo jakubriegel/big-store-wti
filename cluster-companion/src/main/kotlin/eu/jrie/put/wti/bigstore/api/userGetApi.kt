@@ -10,6 +10,7 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.response.respond
 import io.ktor.routing.accept
 import io.ktor.routing.get
@@ -23,18 +24,14 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 fun Application.userGetApi() {
-    val jsonMapper = JsonMapper()
-    val redis = RedisConnector(environment.config.property("big-store.storage.redis.host").getString())
-    val cache = UserCacheRepository(redis, jsonMapper)
-    val cassandra = CassandraConnector(environment.config.property("big-store.storage.cassandra.host").getString())
-    val repository = UserRepository(cassandra, this)
-    val service = UserCacheService(this, cache, repository)
+    val service = userCacheService()
     routing {
         route("/user/{id}") {
             accept(ContentType.Application.Json) {
                 get {
-                    service.get(userId)
-                        .let { call.respond(it) }
+                    val user = service.get(userId)
+                    if (user == null ) call.respond(NotFound)
+                    else call.respond(user)
                 }
             }
             accept(ContentType.Text.CSV) {
@@ -44,4 +41,26 @@ fun Application.userGetApi() {
             }
         }
     }
+}
+
+@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
+@KtorExperimentalAPI
+private fun Application.userCacheService(): UserCacheService {
+    val bestBefore = environment.config.property("big-store.cache.bestBefore").getString().toLong()
+    val storeTimeout = environment.config.property("big-store.cache.storeTimeout").getString().toLong()
+
+    val redis = RedisConnector(environment.config.property("big-store.cache.redis.host").getString())
+    val cache = UserCacheRepository(
+        redis,
+        JsonMapper(),
+        environment.config.property("big-store.cache.ttl").getString().toLong()
+    )
+    val cassandra = CassandraConnector(environment.config.property("big-store.store.cassandra.host").getString())
+    val repository = UserRepository(cassandra, this)
+
+    return UserCacheService(
+        bestBefore, storeTimeout,
+        this, cache, repository
+    )
 }
