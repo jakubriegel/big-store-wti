@@ -31,16 +31,16 @@ fun Application.userGetApi() {
     val repository = UserRepository(cassandra, this)
     val service = UserCacheService(this, cache, repository)
     routing {
-        route("/user") {
+        route("/user/{id}") {
             accept(ContentType.Application.Json) {
-                get("/full/{id}") {
+                get {
                     val id = call.parameters["id"]!!.toInt()
                     val user = service.get(id).let { jsonMapper.write(it) }
                     call.respondText(user, ContentType.Application.Json)
                 }
             }
             accept(ContentType.Text.CSV) {
-                get("/full/{id}") {
+                get {
                     call.respond(HttpStatusCode.ServiceUnavailable)
                 }
             }
