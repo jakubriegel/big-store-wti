@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test
 import java.time.Instant.now
 
 @ObsoleteCoroutinesApi
-internal class UserUpdateServiceTest {
+internal class UserManageServiceTest {
 
     private val cassandraMock: CassandraConnector = mockk()
-    private val service = UserUpdateService(cassandraMock)
+    private val service = UserManageService(cassandraMock)
 
     private val userId = 1
 
@@ -63,5 +63,18 @@ internal class UserUpdateServiceTest {
         // then
         val desiredCql = "UPDATE user_stats SET last_active = ${stats.lastActive.toEpochMilli()} WHERE user_id = $userId"
         coVerify(exactly = 1) { cassandraMock.cql(desiredCql) }
+    }
+
+    @Test
+    fun `should delete all user data`() = runBlocking {
+        // when
+        service.deleteUser(userId)
+
+        // then
+        coVerify(exactly = 1) {
+            cassandraMock.cql("DELETE FROM user_avg WHERE user_id = $userId")
+            cassandraMock.cql("DELETE FROM user_rated_movies WHERE user_id = $userId")
+            cassandraMock.cql("DELETE FROM user_stats WHERE user_id = $userId")
+        }
     }
 }
