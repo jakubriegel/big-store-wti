@@ -26,6 +26,7 @@ services:
         restart: on-failure
         environment:
             - CACHE_HOST=big-store_cache_1
+            - BS_ENV=PROD
         # ports:
             # - 60010-60150:60001
         networks:
@@ -41,5 +42,4 @@ services:
 
 
 networks:
-    big-store-net:
-    cache-net:
+    big-store-net: 
