@@ -20,8 +20,14 @@ data class UpdateCacheTask (
         mutex.unlock()
     }
 
-    suspend fun await(): User {
-        mutex.lock()
-        return user
+    fun cancel() {
+        mutex.unlock()
     }
+
+    suspend fun await(): User? {
+        mutex.lock()
+        return if (this::user.isInitialized) user
+        else null
+    }
+
 }

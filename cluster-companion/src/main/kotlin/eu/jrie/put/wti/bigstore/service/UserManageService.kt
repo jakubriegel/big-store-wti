@@ -7,7 +7,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import org.slf4j.LoggerFactory
 
 @ObsoleteCoroutinesApi
-class UserUpdateService (
+class UserManageService (
     private val cassandra: CassandraConnector
 ) {
 
@@ -28,7 +28,13 @@ class UserUpdateService (
         cassandra.cql("UPDATE user_stats SET last_active = ${stats.lastActive.toEpochMilli()} WHERE user_id = $userId")
     }
 
+    suspend fun deleteUser(userId: Int) {
+        cassandra.cql("DELETE FROM user_avg WHERE user_id = $userId")
+        cassandra.cql("DELETE FROM user_rated_movies WHERE user_id = $userId")
+        cassandra.cql("DELETE FROM user_stats WHERE user_id = $userId")
+    }
+
     companion object {
-        private val logger = LoggerFactory.getLogger(UserUpdateService::class.java)
+        private val logger = LoggerFactory.getLogger(UserManageService::class.java)
     }
 }
