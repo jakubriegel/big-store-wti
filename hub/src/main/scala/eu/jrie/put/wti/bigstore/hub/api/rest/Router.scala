@@ -1,4 +1,4 @@
-package eu.jrie.put.wti.bigstore.hub.routing
+package eu.jrie.put.wti.bigstore.hub.api.rest
 
 import java.net.http.HttpHeaders
 
