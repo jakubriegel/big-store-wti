@@ -74,7 +74,7 @@ def produce():
         channel.basic_publish(exchange='user_profile',
                               routing_key='',
                               body=json.dumps(user()))
-        sleep(0.1)
+        sleep(10)
 
 
 if __name__ == '__main__':
