@@ -3,7 +3,7 @@ package eu.jrie.put.wti.bigstore.hub
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import eu.jrie.put.wti.bigstore.hub.discovery.DiscoveryRoutes
-import eu.jrie.put.wti.bigstore.hub.routing.Router
+import eu.jrie.put.wti.bigstore.hub.api.rest.Router
 
 object HubService extends App {
   sealed trait HubServiceMsg
