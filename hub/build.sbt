@@ -11,7 +11,11 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % "2.6.4",
   "com.typesafe.akka" %% "akka-http"   % "10.1.11",
 
+  // rabbitmq
+  "com.lightbend.akka" %% "akka-stream-alpakka-amqp" % "2.0.0",
+
   // util
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.10.3",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
   // test

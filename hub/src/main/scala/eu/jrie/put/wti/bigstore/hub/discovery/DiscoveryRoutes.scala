@@ -1,18 +1,18 @@
 package eu.jrie.put.wti.bigstore.hub.discovery
 
-import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import eu.jrie.put.wti.bigstore.hub.HubService.{Companions, HubError, HubServiceMsg}
-import eu.jrie.put.wti.bigstore.hub.discovery.CompanionRegistry.{AllCompanionsReady, CompanionId, CompanionRegistryMsg, RegisterCompanion, SetCompanionReady}
+import eu.jrie.put.wti.bigstore.hub.HubService.{CompanionsMsg, HubError, HubServiceMsg}
+import eu.jrie.put.wti.bigstore.hub.discovery.CompanionRegistry._
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
-import scala.concurrent.duration._
 
 object DiscoveryRoutes {
   sealed trait CompanionsDiscoveryMsg
@@ -25,8 +25,8 @@ object DiscoveryRoutes {
     implicit val executionContext: ExecutionContextExecutor = actorSystem.executionContext
     implicit val timeout: Timeout = 15.seconds
 
-    import akka.http.scaladsl.server.Directives._
     import akka.actor.typed.scaladsl.AskPattern._
+    import akka.http.scaladsl.server.Directives._
 
     concat(
       path("register") {
@@ -85,7 +85,7 @@ object DiscoveryRoutes {
 
     Behaviors.receiveMessage {
       case CompanionsReady(hosts) =>
-        hub ! Companions(hosts)
+        hub ! CompanionsMsg(hosts)
         Behaviors.stopped
       case CompanionsDiscoveryError() =>
         hub ! HubError("CompanionsDiscoveryError")

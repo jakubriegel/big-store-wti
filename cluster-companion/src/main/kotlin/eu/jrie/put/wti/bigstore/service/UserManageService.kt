@@ -18,9 +18,11 @@ class UserManageService (
         cassandra.cql("UPDATE user_avg SET $sets WHERE user_id = $userId")
     }
 
-    suspend fun addUserRatedMovie(userId: Int, movie: Movie) {
-        logger.info("updating rated movies for user $userId $movie")
-        cassandra.cql("INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${movie.id}, '${movie.genre}', ${movie.rating})")
+    suspend fun updateUserRatedMovies(userId: Int, movies: List<Movie>) {
+        logger.info("updating rated movies for user $userId $movies")
+        movies.forEach {
+            cassandra.cql("INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${it.id}, '${it.genre}', ${it.rating})")
+        }
     }
 
     suspend fun updateUserStats(userId: Int, stats: UserStats) {

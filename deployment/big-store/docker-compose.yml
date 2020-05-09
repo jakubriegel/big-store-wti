@@ -1,6 +1,5 @@
 version: "3.7"
 services:
-    # store
     store:
         build: ../../db
         ports: 
@@ -12,7 +11,6 @@ services:
         networks: 
             - big-store-net
 
-    # hub
     hub:
         build: ../../hub
         ports: 
@@ -20,7 +18,13 @@ services:
         networks: 
             - big-store-net
 
-    # companions
+    events:
+        image: rabbitmq:latest
+        ports: 
+            - 5672:5672
+        networks: 
+            - big-store-net
+
     cluster-companion:
         build: ../../cluster-companion
         restart: on-failure

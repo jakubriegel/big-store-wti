@@ -30,8 +30,8 @@ fun Application.userManageApi() {
                 call.respond(HttpStatusCode.OK)
             }
             put("/movies") {
-                val movie: Movie = call.receive()
-                service.addUserRatedMovie(userId, movie)
+                val movie: ListResourceUpdateRequest = call.receive()
+                service.updateUserRatedMovies(userId, movie.data)
                 call.respond(HttpStatusCode.OK)
             }
             put("/stats") {
@@ -46,3 +46,7 @@ fun Application.userManageApi() {
         }
     }
 }
+
+data class ListResourceUpdateRequest (
+    val data: List<Movie>
+)

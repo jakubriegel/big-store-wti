@@ -1,4 +1,4 @@
-package eu.jrie.put.wti.bigstore.hub.routing
+package eu.jrie.put.wti.bigstore.hub.api.rest
 
 class RouterTest extends org.scalatest.FunSuite {
   test("should run tests") {
