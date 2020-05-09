@@ -8,7 +8,7 @@ from itertools import groupby
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='user_profile', exchange_type='fanout')
+channel.exchange_declare(exchange='bs_update', exchange_type='fanout')
 
 REFERENCE_PROFILE = {
     "id": 1,
@@ -71,9 +71,11 @@ def user():
 
 def produce():
     for n in range(1000):
-        channel.basic_publish(exchange='user_profile',
+        event = user()
+        print(event["id"])
+        channel.basic_publish(exchange='bs_update',
                               routing_key='',
-                              body=json.dumps(user()))
+                              body=json.dumps(event))
         sleep(10)
 
 
