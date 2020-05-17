@@ -1,4 +1,5 @@
 from statistics import mean
+from typing import Dict, List
 
 import pika
 from time import sleep, time
@@ -6,7 +7,25 @@ from random import randint, uniform, choice
 import json
 from itertools import groupby
 from multiprocessing import Queue
+import csv
 
+
+def _genres() -> Dict[int, List[str]]:
+    with open('../../data/movie_genres.csv') as genres_file:
+        reader = csv.reader(genres_file, delimiter='\t')
+        next(reader)
+        return {movie_id: list(map(lambda g: g[1], genres)) for movie_id, genres in groupby(reader, key=lambda r: r[0])}
+
+
+def _ratings() -> List[tuple]:
+    with open('../../data/user_ratedmovies-timestamps.csv') as ratings_file:
+        reader = csv.reader(ratings_file, delimiter='\t')
+        next(reader)
+        return sorted(map(tuple, reader), key=lambda i: i[3], reverse=True)
+
+
+_GENRES = _genres()
+_RATINGS = _ratings()
 _EXCHANGE = 'bs_update'
 _connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 _channel = _connection.channel()
