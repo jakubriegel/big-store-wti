@@ -76,7 +76,7 @@ def publish(ids_queue: Queue = None):
         sent = publish_user()
         if ids_queue is not None:
             ids_queue.put(sent)
-        sleep(.01)
+        sleep(.05)
     print('produce end')
 
 
