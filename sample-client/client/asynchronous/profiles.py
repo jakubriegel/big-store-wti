@@ -5,10 +5,12 @@ from time import sleep, time
 from random import randint, uniform, choice
 import json
 from itertools import groupby
+from multiprocessing import Queue
 
+_EXCHANGE = 'bs_update'
 _connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 _channel = _connection.channel()
-_channel.exchange_declare(exchange='bs_update', exchange_type='fanout')
+_channel.exchange_declare(exchange=_EXCHANGE, exchange_type='fanout')
 
 _REFERENCE_PROFILE = {
     "id": 1,
@@ -69,15 +71,22 @@ def _user():
     }
 
 
-def produce():
-    for n in range(1000):
-        event = _user()
-        print(event["id"])
-        _channel.basic_publish(exchange='bs_update',
-                               routing_key='',
-                               body=json.dumps(event))
-        sleep(10)
+def publish(ids_queue: Queue = None):
+    for _ in range(1000):
+        sent = publish_user()
+        if ids_queue is not None:
+            ids_queue.put(sent)
+        sleep(.01)
+    print('produce end')
+
+
+def publish_user() -> int:
+    event = _user()
+    user_id = event["id"]
+    _channel.basic_publish(exchange=_EXCHANGE, routing_key='', body=json.dumps(event))
+    print(f'Sending update for user {user_id}')
+    return user_id
 
 
 if __name__ == '__main__':
-    produce()
+    publish()

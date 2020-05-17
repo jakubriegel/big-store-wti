@@ -1,2 +1,6 @@
 venv
+venv-wsl
 .idea
+build
+out
+.python-version
