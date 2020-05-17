@@ -6,11 +6,11 @@ from random import randint, uniform, choice
 import json
 from itertools import groupby
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
-channel.exchange_declare(exchange='bs_update', exchange_type='fanout')
+_connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+_channel = _connection.channel()
+_channel.exchange_declare(exchange='bs_update', exchange_type='fanout')
 
-REFERENCE_PROFILE = {
+_REFERENCE_PROFILE = {
     "id": 1,
     "averageRating": {
         "action": 0.0,
@@ -47,10 +47,10 @@ REFERENCE_PROFILE = {
 }
 
 
-def user():
+def _user():
     rated_movies = [{
         "id": randint(0, 10000),
-        "genre": choice(list(REFERENCE_PROFILE['averageRating'].keys())),
+        "genre": choice(list(_REFERENCE_PROFILE['averageRating'].keys())),
         "rating": round(uniform(0.0, 10.0), 1)
     } for _ in range(randint(1, 100))]
 
@@ -71,11 +71,11 @@ def user():
 
 def produce():
     for n in range(1000):
-        event = user()
+        event = _user()
         print(event["id"])
-        channel.basic_publish(exchange='bs_update',
-                              routing_key='',
-                              body=json.dumps(event))
+        _channel.basic_publish(exchange='bs_update',
+                               routing_key='',
+                               body=json.dumps(event))
         sleep(10)
 
 
