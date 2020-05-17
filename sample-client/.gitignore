@@ -4,3 +4,4 @@ venv-wsl
 build
 out
 .python-version
+stats.json
