@@ -1,8 +1,8 @@
 from multiprocessing import Process
+from multiprocessing import Queue
 
 from client.asynchronous.profiles import publish
 from client.rest.get import get_client
-from multiprocessing import Queue
 
 
 def insert_rest() -> None:

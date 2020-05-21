@@ -1,8 +1,8 @@
 import json
 from multiprocessing import Queue
+from random import choice
 from statistics import mean
 from typing import Set
-from random import choice
 
 from requests import get
 

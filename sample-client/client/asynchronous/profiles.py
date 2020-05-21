@@ -1,15 +1,14 @@
-from statistics import mean
-from typing import Dict, List
-
-import pika
-from time import sleep, time
-from random import randint, uniform, choice
+import csv
 import json
 from itertools import groupby
 from multiprocessing import Queue
-import csv
-from requests import get
+from random import choice
+from statistics import mean
+from time import sleep
+from typing import Dict, List
 
+import pika
+from requests import get
 
 _BS_URL = 'http://localhost:80/'
 
