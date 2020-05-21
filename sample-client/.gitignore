@@ -5,3 +5,4 @@ build
 out
 .python-version
 stats.json
+**/__pycache__
