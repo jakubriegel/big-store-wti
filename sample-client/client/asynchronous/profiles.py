@@ -15,14 +15,14 @@ _BS_URL = 'http://localhost:80/'
 
 
 def _genres() -> Dict[int, List[str]]:
-    with open('../../data/movie_genres.csv') as genres_file:
+    with open('./data/movie_genres.csv') as genres_file:
         reader = csv.reader(genres_file, delimiter='\t')
         next(reader)
         return {int(movie_id): list(map(lambda g: g[1].lower().replace('-', '_'), genres)) for movie_id, genres in groupby(reader, key=lambda r: r[0])}
 
 
 def _ratings() -> List[tuple]:
-    with open('../../data/user_ratedmovies-timestamps.csv') as ratings_file:
+    with open('./data/user_ratedmovies-timestamps.csv') as ratings_file:
         reader = csv.reader(ratings_file, delimiter='\t')
         next(reader)
         return sorted(map(lambda row: (int(row[0]), int(row[1]), float(row[2]), int(row[3])), map(tuple, reader)), key=lambda i: i[3], reverse=True)
@@ -101,7 +101,7 @@ def publish(ids_queue: Queue = None):
         sent = publish_user()
         if ids_queue is not None:
             ids_queue.put(sent)
-        sleep(.001)
+        sleep(.01)
     print('produce end')
 
 
