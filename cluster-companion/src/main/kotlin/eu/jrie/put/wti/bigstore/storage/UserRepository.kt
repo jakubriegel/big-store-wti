@@ -28,7 +28,7 @@ class UserRepository (
         )
     } .let { (ratings, movies, stats) ->
         User(id, ratings.await(), movies.await(), stats.await())
-    } .also { logger.info("found user ${it.id}")  }
+    }
 
     private suspend fun Flow<Row>.toRatings() = map { row ->
         row.columnDefinitions

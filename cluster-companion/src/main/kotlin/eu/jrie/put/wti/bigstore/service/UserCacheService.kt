@@ -42,12 +42,12 @@ class UserCacheService private constructor(
 
     init {
         scope.launch {
-            logger.info("started db fetch job")
+            logger.debug("Started db fetch job")
             updateBuffer.consumeEach { task ->
                 fetchUserFromDb(task.userId)
                     .also {
                         if (it != null) {
-                            logger.info("Completing fetch task for $it")
+                            logger.debug("Completing fetch task for $it")
                             task.complete(it)
                         }
                         else {
@@ -69,7 +69,7 @@ class UserCacheService private constructor(
 
     private suspend fun getUpToDate(cached: UserCache) = when {
         cached.isUpToDate() -> {
-            logger.info("returning user from cache ${cached.user}")
+            logger.info("Returning user from cache ${cached.user}")
             cached.user
         }
         else -> tryUpdate(cached.user)
@@ -78,8 +78,8 @@ class UserCacheService private constructor(
     private suspend fun tryUpdate(user: User) = UpdateCacheTask(user.id).let {
         updateBuffer.send(it)
         withTimeoutOrNull(storeTimeout) {
-            it.await().also { u -> logger.info("returning fresh user from db $u") }
-        } ?: user.also { u -> logger.info("returning user from cache after timeout $u") }
+            it.await().also { u -> logger.info("Returning fresh user from db $u") }
+        } ?: user.also { u -> logger.info("Returning user from cache after timeout $u") }
     }
 
     private fun UserCache.isUpToDate() = updatedAt.isAfter(now() - bestBefore)
