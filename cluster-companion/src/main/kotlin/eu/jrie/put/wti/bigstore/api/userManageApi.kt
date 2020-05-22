@@ -6,7 +6,6 @@ import eu.jrie.put.wti.bigstore.service.UserManageService
 import eu.jrie.put.wti.bigstore.storage.cassandra.CassandraConnector
 import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.application.log
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NoContent
 import io.ktor.request.receive
@@ -32,7 +31,6 @@ fun Application.userManageApi() {
             }
             put("/movies") {
                 val movie: ListResourceUpdateRequest = call.receive()
-                log.info(movie.data.toString())
                 service.updateUserRatedMovies(userId, movie.data)
                 call.respond(HttpStatusCode.OK)
             }
