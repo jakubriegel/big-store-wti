@@ -11,7 +11,7 @@ data class User (
 
 data class Movie (
     val id: Int,
-    val genre: String,
+    val genre: List<String>,
     val rating: Float
 )
 

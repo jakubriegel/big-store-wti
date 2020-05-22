@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS  user_rated_movies;
 CREATE TABLE user_rated_movies (
     user_id int,
     movie_id int,
-    genre text,
+    genre list<text>,
     rating float,
 
     PRIMARY KEY (user_id, movie_id)

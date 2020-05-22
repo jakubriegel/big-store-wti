@@ -43,7 +43,7 @@ def _user():
     if user_response.status_code == 404:
         rated_movies = [{
             "id": movie_id,
-            "genre": choice(genres),  # TODO: use list
+            "genre": genres,
             "rating": rating
         }]
         average_rating = {
@@ -67,19 +67,20 @@ def _user():
         if len(current_rating) == 0:
             rated_movies = current_rated_movies + [{
                 "id": movie_id,
-                "genre": choice(genres),  # TODO: use list
+                "genre": genres,
                 "rating": rating
             }]
         else:
             rated_movies = list(filter(lambda m: m['id'] != movie_id, current_rated_movies)) + [{
                 "id": movie_id,
-                "genre": choice(genres),  # TODO: use list
+                "genre": genres,
                 "rating": rating
             }]
 
+        flat_ratings = [(r['rating'], g) for r in rated_movies for g in r['genre']]
         average_rating = {
-            genre: round(mean(list(map(lambda r: r['rating'], ratings))), 1)
-            for genre, ratings in groupby(rated_movies, key=lambda m: m['genre'])
+            genre: round(mean(list(map(lambda r: r[0], ratings))), 1)
+            for genre, ratings in groupby(flat_ratings, key=lambda m: m[1])
         }
 
         return {

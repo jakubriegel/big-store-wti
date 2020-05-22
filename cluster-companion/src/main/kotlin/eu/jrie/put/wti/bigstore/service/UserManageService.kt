@@ -20,8 +20,8 @@ class UserManageService (
 
     suspend fun updateUserRatedMovies(userId: Int, movies: List<Movie>) {
         logger.debug("Updating rated movies for user $userId $movies")
-        movies.forEach {
-            cassandra.cql("INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${it.id}, '${it.genre}', ${it.rating})")
+        movies.forEach { movie ->
+            cassandra.cql("INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${movie.id}, ${movie.genre.map { "'$it'" }}, ${movie.rating})")
         }
     }
 

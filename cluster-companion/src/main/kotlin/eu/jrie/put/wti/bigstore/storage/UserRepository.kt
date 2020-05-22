@@ -41,7 +41,7 @@ class UserRepository (
     } .single()
 
     private suspend fun Flow<Row>.toMovies() = map { row ->
-        Triple(row.getInt("movie_id"), row.getString("genre") ?: "", row.getFloat("rating"))
+        Triple(row.getInt("movie_id"), row.getList("genre", String::class.java) ?: emptyList(), row.getFloat("rating"))
     }.map { (id, genre, rating) ->
         Movie(id, genre, rating)
     }.toList()
@@ -51,8 +51,4 @@ class UserRepository (
     }.map {
         UserStats(it)
     }.single()
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(UserRepository::class.java)
-    }
 }

@@ -42,8 +42,8 @@ internal class UserManageServiceTest {
     @Test
     fun `should update usuer rated movies`() = runBlocking {
         // given
-        val movie1 = Movie(1, "action", 1.2f)
-        val movie2 = Movie(2, "action", 1.2f)
+        val movie1 = Movie(1, listOf("action"), 1.2f)
+        val movie2 = Movie(2, listOf("action"), 1.2f)
         val movies = listOf(movie1, movie2)
 
         // when
@@ -52,7 +52,7 @@ internal class UserManageServiceTest {
         // then
         movies.forEach {
             coVerify(exactly = 1) { cassandraMock.cql(
-                "INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${it.id}, '${it.genre}', ${it.rating})"
+                "INSERT INTO user_rated_movies (user_id, movie_id, genre, rating) VALUES ($userId, ${it.id}, [\'action\'], ${it.rating})"
             ) }
         }
     }
