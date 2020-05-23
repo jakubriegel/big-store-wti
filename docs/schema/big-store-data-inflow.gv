@@ -4,7 +4,7 @@ digraph bigstore {
     labelloc=t
     fontname="JetBrains Mono Medium"
 
-    graph [fontsize=45 ranksep=2 bgcolor=ivory4]
+    graph [fontsize=45 ranksep=2 bgcolor=cornsilk3]
     node [fontname="JetBrains Mono Medium" fontcolor=white]
     edge [dir=both penwidth=7] 
     nodesep=3
