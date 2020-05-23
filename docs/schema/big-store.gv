@@ -11,12 +11,11 @@ digraph bigstore {
 
     subgraph hub {
         node [style=filled] 
+        rank=source;
 
-        {rank=source;
-            "Hub" [xlabel="Scala | Akka HTTP" fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
-            "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
-            "async" [xlabel="RabbitMQ" fontsize=35 shape=oval color=cyan3 height=2 width=4]
-        }
+        "Hub" [xlabel="Scala | Akka HTTP" fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
+        "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
+        "async" [xlabel="RabbitMQ" fontsize=35 shape=oval color=cyan3 height=2 width=4]
 
         "REST" -> "Hub" [dir=both headport=w] 
         "Hub" -> "async" [style=invis]
@@ -50,10 +49,9 @@ digraph bigstore {
 
     subgraph store {
         node [fontsize=45 shape=doublecircle width=4.5 style=filled color=dodgerblue1]
-
-        { rank=sink; 
-            "store" [xlabel="cassandra"]
-        }
+        rank=sink; 
+        
+        "store" [xlabel="cassandra"]
     }
 
     subgraph companions_connections {
