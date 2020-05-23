@@ -1,6 +1,6 @@
 digraph bigstore {
     
-    label="big-store"
+    label="big-store data inflow"
     labelloc=t
     fontname="JetBrains Mono Medium"
 
@@ -8,6 +8,7 @@ digraph bigstore {
     node [fontname="JetBrains Mono Medium" fontcolor=white]
     edge [dir=both penwidth=7] 
     nodesep=3
+    rankdir=LR
 
     subgraph hub {
         node [style=filled] 

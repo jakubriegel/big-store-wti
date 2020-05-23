@@ -27,13 +27,13 @@ digraph bigstore {
     subgraph companions {
         node [
                 xlabel="Kotlin | Ktor"
-                padding=5 fontsize=32 shape=octagon style=filled color=chocolate height=2 colorsheme=paired12
+                padding=5 fontsize=35 shape=octagon style=filled color=chocolate height=3 colorsheme=paired12
             ]
         edge [style=bold colorscheme="paired12"]
 
-        "cluster-companion-1"
-        "cluster-companion-2"
-        "cluster-companion-3"
+        "companion-1"
+        "companion-2"
+        "companion-3"
     }
 
     subgraph caches {
@@ -57,20 +57,20 @@ digraph bigstore {
     }
 
     subgraph companions_connections {
-        "cluster-companion-1" -> "store" [headport=n color=grey11 style=dotted]
-        "cluster-companion-2" -> "store" [headport=n color=grey11 style=dotted]
-        "cluster-companion-3" -> "store" [headport=n color=grey11 style=dotted]
+        "companion-1" -> "store" [headport=n color=grey11 style=dotted]
+        "companion-2" -> "store" [headport=n color=grey11 style=dotted]
+        "companion-3" -> "store" [headport=n color=grey11 style=dotted]
         
-        "cluster-companion-1" -> "cache-1" [headport=n color=grey11]
-        "cluster-companion-2" -> "cache-2" [headport=n color=grey11]
-        "cluster-companion-3" -> "cache-3" [headport=n color=grey11]
+        "companion-1" -> "cache-1" [headport=n color=grey11]
+        "companion-2" -> "cache-2" [headport=n color=grey11]
+        "companion-3" -> "cache-3" [headport=n color=grey11]
     }
 
 
     subgraph Hub_service_connections {
-        "cluster-companion-1" -> "Hub" [headport=s color=grey11]
-        "cluster-companion-2" -> "Hub" [headport=s color=grey11]
-        "cluster-companion-3" -> "Hub" [headport=s color=grey11]
+        "companion-1" -> "Hub" [headport=s color=grey11]
+        "companion-2" -> "Hub" [headport=s color=grey11]
+        "companion-3" -> "Hub" [headport=s color=grey11]
     }
 
 }
