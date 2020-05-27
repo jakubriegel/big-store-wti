@@ -24,7 +24,7 @@ digraph bigstore {
         "hub-buffer" -> "Hub" [headport=s tailport=e style=dotted]
     }
         
-    "store" [fontsize=45 shape=doublecircle width=4.5 color=dodgerblue1]
+    "store" [fontsize=32 shape=doublecircle width=2.5 color=dodgerblue1]
     "companion" [padding=5 fontsize=32 shape=octagon color=chocolate height=2 colorsheme=paired12]
     "cache" [padding=5 fontsize=32 shape=circle color=darkgoldenrod3 colorsheme=paired12]
     "store-buffer" [fontsize=25 shape=cds color=dimgrey height=1 width=3]
