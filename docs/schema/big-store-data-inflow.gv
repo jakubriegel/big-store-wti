@@ -5,61 +5,32 @@ digraph bigstore {
     fontname="JetBrains Mono Medium"
 
     graph [fontsize=45 ranksep=2 bgcolor=cornsilk3]
-    node [fontname="JetBrains Mono Medium" fontcolor=white]
-    edge [dir=both penwidth=7] 
+    node [fontname="JetBrains Mono Medium" fontcolor=white style=filled]
+    edge [penwidth=7 style=bold] 
     nodesep=3
     rankdir=LR
 
     subgraph hub {
-        node [style=filled] 
+        rank=source;
+        "Hub" [fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
+        "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
+        "hub-buffer" [fontsize=25 shape=cds color=dimgrey height=1 width=3]
+        "async" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
 
-        {rank=source;
-            "Hub" [xlabel="Scala | Akka HTTP" fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
-            "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
-            "async" [xlabel="RabbitMQ" fontsize=35 shape=oval color=cyan3 height=2 width=4]
-        }
-
-        "REST" -> "Hub" [dir=both headport=w] 
-        "Hub" -> "async" [style=invis]
-        "async" -> "Hub" [headport=e style=dotted]
+        "REST" -> "Hub" [dir=both headport=n] 
+        "Hub" -> "hub-buffer" [style=invis]
+        "hub-buffer" -> "async" [style=invis]
+        "async" -> "hub-buffer" [headport=s tailport=n style=dotted]
+        "hub-buffer" -> "Hub" [headport=s tailport=e style=dotted]
+    }
         
-    }
-    
-    subgraph companions {
-        node [
-                xlabel="Kotlin | Ktor"
-                padding=5 fontsize=32 shape=octagon style=filled color=chocolate height=2 colorsheme=paired12
-            ]
-        edge [style=bold colorscheme="paired12"]
+    "store" [fontsize=45 shape=doublecircle width=4.5 color=dodgerblue1]
+    "companion" [padding=5 fontsize=32 shape=octagon color=chocolate height=2 colorsheme=paired12]
+    "cache" [padding=5 fontsize=32 shape=circle color=darkgoldenrod3 colorsheme=paired12]
+    "store-buffer" [fontsize=25 shape=cds color=dimgrey height=1 width=3]
 
-        "companion"
-    }
-
-    subgraph caches {
-        node [
-                xlabel="Redis"
-                padding=5 fontsize=32 shape=circle style=filled color=darkgoldenrod3 colorsheme=paired12
-            ]
-        edge [style=bold colorscheme="paired12"]
-
-        "cache"
-    }
-
-    subgraph store {
-        node [fontsize=45 shape=doublecircle width=4.5 style=filled color=dodgerblue1]
-        rank=sink; 
-        
-        "store" [xlabel="cassandra"]
-    }
-
-    subgraph companions_connections {
-        "companion" -> "store" [headport=n color=grey11 style=dotted]
-        "companion" -> "cache" [headport=n color=grey11]
-    }
-
-
-    subgraph Hub_service_connections {
-        "companion" -> "Hub" [headport=s color=grey11]
-    }
-
+    "Hub" -> "companion" [headport=w tailport=e color=grey11]
+    "companion" -> "store-buffer" [headport=w tailport=e color=grey11 style=dotted]
+    "store-buffer" -> "store" [headport=n tailport=e color=grey11 style=dotted]
+    "companion" -> "cache" [headport=w color=chocolate style=dashed]
 }
