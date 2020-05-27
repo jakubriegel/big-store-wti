@@ -4,30 +4,35 @@ digraph bigstore {
     labelloc=t
     fontname="JetBrains Mono Medium"
 
-    graph [fontsize=45 ranksep=2 bgcolor=ivory4]
+    graph [fontsize=45 ranksep=2 bgcolor=cornsilk3]
     node [fontname="JetBrains Mono Medium" fontcolor=white]
     edge [dir=both penwidth=7] 
     nodesep=3
 
-    subgraph gateway {
-        node [
-                xlabel="Scala | Akka HTTP"
-                fontsize=40 shape=doubleoctagon style=filled color=cyan4 height=3 width=8
-            ]
+    subgraph hub {
+        node [style=filled] 
+        rank=source;
 
-        {rank=source; "gateway"}
+        "Hub" [xlabel="Scala | Akka HTTP" fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
+        "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
+        "async" [xlabel="RabbitMQ" fontsize=35 shape=oval color=cyan3 height=2 width=4]
+
+        "REST" -> "Hub" [dir=both headport=w] 
+        "Hub" -> "async" [style=invis]
+        "async" -> "Hub" [headport=e style=dotted]
+        
     }
     
     subgraph companions {
         node [
                 xlabel="Kotlin | Ktor"
-                padding=5 fontsize=32 shape=octagon style=filled color=chocolate height=2 colorsheme=paired12
+                padding=5 fontsize=35 shape=octagon style=filled color=chocolate height=3 colorsheme=paired12
             ]
         edge [style=bold colorscheme="paired12"]
 
-        "cluster-companion-1"
-        "cluster-companion-2"
-        "cluster-companion-3"
+        "companion-1"
+        "companion-2"
+        "companion-3"
     }
 
     subgraph caches {
@@ -44,25 +49,26 @@ digraph bigstore {
 
     subgraph store {
         node [fontsize=45 shape=doublecircle width=4.5 style=filled color=dodgerblue1]
-
-        { rank=sink; "cassandra" }
+        rank=sink; 
+        
+        "store" [xlabel="cassandra"]
     }
 
     subgraph companions_connections {
-        "cluster-companion-1" -> "cassandra" [headport=n color=grey11]
-        "cluster-companion-2" -> "cassandra" [headport=n color=grey11]
-        "cluster-companion-3" -> "cassandra" [headport=n color=grey11]
+        "companion-1" -> "store" [headport=n color=grey11 style=dotted]
+        "companion-2" -> "store" [headport=n color=grey11 style=dotted]
+        "companion-3" -> "store" [headport=n color=grey11 style=dotted]
         
-        "cluster-companion-1" -> "cache-1" [headport=n color=grey11]
-        "cluster-companion-2" -> "cache-2" [headport=n color=grey11]
-        "cluster-companion-3" -> "cache-3" [headport=n color=grey11]
+        "companion-1" -> "cache-1" [headport=n color=grey11]
+        "companion-2" -> "cache-2" [headport=n color=grey11]
+        "companion-3" -> "cache-3" [headport=n color=grey11]
     }
 
 
-    subgraph gateway_service_connections {
-        "cluster-companion-1" -> "gateway" [headport=s color=grey11]
-        "cluster-companion-2" -> "gateway" [headport=s color=grey11]
-        "cluster-companion-3" -> "gateway" [headport=s color=grey11]
+    subgraph Hub_service_connections {
+        "companion-1" -> "Hub" [headport=s color=grey11]
+        "companion-2" -> "Hub" [headport=s color=grey11]
+        "companion-3" -> "Hub" [headport=s color=grey11]
     }
 
 }

@@ -1,0 +1,30 @@
+digraph bigstore {
+    
+    label="big-store data outflow"
+    labelloc=t
+    fontname="JetBrains Mono Medium"
+
+    graph [fontsize=45 ranksep=2 bgcolor=cornsilk3]
+    node [fontname="JetBrains Mono Medium" fontcolor=white style=filled]
+    edge [penwidth=7 style=bold] 
+    nodesep=3
+    rankdir=LR
+
+    subgraph hub {
+        rank=source;
+        "Hub" [fontsize=50 shape=doubleoctagon color=cyan4 height=3 width=8]
+        "REST" [fontsize=35 shape=oval color=cyan3 height=2 width=4]
+
+        "REST" -> "Hub" [tailport=sw headport=nw]
+        "Hub" -> "REST" [headport=se tailport=ne] 
+    }
+        
+    "store" [fontsize=32 shape=doublecircle width=2.5 color=dodgerblue1]
+    "companion" [padding=5 fontsize=32 shape=octagon color=chocolate height=2 colorsheme=paired12]
+    "cache" [padding=5 fontsize=32 shape=circle color=darkgoldenrod3 colorsheme=paired12]
+
+    "companion" -> "Hub" [headport=e tailport=w]
+    "store" -> "companion" [headport=n tailport=s]
+    "cache" -> "companion" [headport=e tailport=n]
+    "companion" -> "cache" [headport=w tailport=se color=chocolate style=dashed]
+}
