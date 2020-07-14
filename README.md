@@ -4,6 +4,7 @@
 Big Store is a highly efficient system for storing large amounts of data with warranted GET time.
 
 ### Table of contents
+- [big-store-wti](#big-store-wti)
   - [Intro](#intro)
     - [Abstract](#abstract)
     - [Table of contents](#table-of-contents)
@@ -16,8 +17,8 @@ Big Store is a highly efficient system for storing large amounts of data with wa
     - [Data flows](#data-flows)
       - [Data inflow](#data-inflow)
       - [Data outflow](#data-outflow)
-    - [Future improvements](#future-improvements)
   - [Implementation state](#implementation-state)
+    - [Future improvements](#future-improvements)
   - [Deployment](#deployment)
     - [Preliminary](#preliminary)
     - [Build](#build)
@@ -71,21 +72,41 @@ Figure below shows the flow of output data in Big Store.
 
 ![Schema of data outflow](docs/schema/big-store-outflow-schema.png)
 
-### Future improvements
-tba
-
 ## Implementation state
-tba
+For the moment being the system is working as described above with a few exceptions. For instance, inserts to Cassandra are not going through any buffer. Nevertheless, the system as a whole works and was successfully demonstrated to the supervisor.
+
+### Future improvements
+Some future improvements may include:
+1. User configurable data model.
+2. Single queue for incoming data in the _Hub_.
+3. Performance analisys and test for possible switch from _Cassandra_ to _MongoDB_ or _MySQL_.
 
 ## Deployment
 ### Preliminary
-tba
+Big Store is deployed on Docker and was tested on Docker Desktop for Windows and Docker on _arm_ powered computer.
 
 ### Build
-tba
+Building Big Store requires preparing fat jars of the _Hub_ and _companion_.
+
+To get the fat jar of the _Hub_ in `hub` dir type:
+```shell
+sbt assembly
+```
+
+To get the fat jar of _companion_ in `cluster-companion` dir type:
+```shell
+./gradlew clean shadowJar
+```
+
+Dockerfile are configured to find the jars in their deafult build locations.
+
 
 ### Run
-tba
+The system can be run by a single shell command:
+```shell
+docker-compose up --build --scale cluster-companion=N --scale cache=N
+```
+Where `N` means desired number of companions. This number should also be set in configuration of the _Hub_ in the file `hub\src\main\resources\application.conf` under the path `big-store.hub.companions..expectedNumber`.
 
 ## License
 tba
