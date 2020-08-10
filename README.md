@@ -110,7 +110,7 @@ docker-compose up --build --scale cluster-companion=N --scale cache=N
 Where `N` means desired number of companions. This number should also be set in configuration of the _Hub_ in the file `hub\src\main\resources\application.conf` under the path `big-store.hub.companions..expectedNumber`.
 
 ## License
-MIT (see [license.md](/license.md))
+MIT (see [license.md](license.md))
 
 ## Credits
 Big Store was made by Jakub Riegel and supervised by Andrzej Szwabe, PhD as a project for Selected Internet Technologies course on Poznań University of Technology.
